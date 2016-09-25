@@ -15,7 +15,11 @@ var stringJsonCleanLibrary = '{"jsonrpc": "2.0", "method": "VideoLibrary.Clean"}
 var stringJsonScanLibrary = '{"jsonrpc": "2.0", "method": "VideoLibrary.Scan"}, "id": "libMovies"}'
 
 function logger (severity, logMessage) {
-	console.log(logMessage)
+	if (severity <3) {
+	  console.log(logMessage)
+  } else if (severity === 3) {
+		console.log ('(' + logMessage + ')')
+	}
 }
 
 var kodiEvent = new (require('events').EventEmitter);
@@ -34,12 +38,12 @@ kodiRPCClient.on('data', function(data) {
 	tcpDataBuffer += data
 	try {
 		var response = JSON.parse(tcpDataBuffer)
-		if (response['method'] === undefined) { // This is an event notification
-			logger(3, "Emitting " + response['method'])
-			kodiEvent.emit(response['method'], response)
-		} else { // This is a response to a previous command
-			logger(3, "Emitting " + response['id'])
+		if (response['method'] === undefined) { // This is a response to a previous command
+			logger(3, "Emitting response " + response['id'])
 			kodiEvent.emit(response['id'], response)
+		} else { // This is an event notification
+			logger(3, "Emitting event " + response['method'])
+			kodiEvent.emit(response['method'], response)
 		}
 	} catch (error) {
 		// We are using try-catch to check when we received a whole JSON response
@@ -74,6 +78,9 @@ var onlyFiles = everything.filter( function (element) {
 	return !element.startsWith('.') & fs.statSync(localFolderBase + element).isFile()
 })
 
+logger(1, '--== File(s) not in a folde ==--')
+logger(1,onlyFiles)
+
 var promiseMoviesList = new Promise (function (resolve, reject) {
 	getMoviesList(resolve, reject)
 })
@@ -81,9 +88,10 @@ var promiseMoviesList = new Promise (function (resolve, reject) {
 promiseMoviesList.then(
   function(moviesList) {
 		var movieListFiltered = moviesList.filter(function (movie) {
-			logger(3,movie['file'].replace(kodiFolderBase,''))
+			logger(6,movie['file'].replace(kodiFolderBase,''))
 			return (onlyFiles.indexOf(movie['file'].replace(kodiFolderBase,''))!==-1)
 		})
+		logger(1, '--== Creating following folder(s) ==--')
 		movieListFiltered.map(function (movie) {
 			//fs.mkdirSync(kodiFolderBase + '/' + movie['label'] + ' (' + movie['year'] + ')')
 			//fs.renameSync(movie['file'], localFolderBase +  movie['label'] + ' (' + movie['year'] + ')/' + movie['file'].replace(kodiFolderBase,''))
@@ -105,5 +113,3 @@ promiseMoviesList.then(
     function(reason) {
       logger(1, 'Handle rejected promise ('+reason+') here.');
 		})
-
-logger(1,onlyFiles)

@@ -1,0 +1,23 @@
+{
+  "name": "tidy_up_my_kodi_library",
+  "version": "1.0.0",
+  "description": "Tidy up my Kodi library folder",
+  "main": "tidyUpMyMoviesFolder.js",
+  "dependencies": {
+    "request": "^2.74.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gverni/tidyUpMyKodiLibrary.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/gverni/tidyUpMyKodiLibrary/issues"
+  },
+  "homepage": "https://github.com/gverni/tidyUpMyKodiLibrary#readme"
+}
