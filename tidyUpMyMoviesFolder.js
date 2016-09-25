@@ -38,6 +38,7 @@ kodiRPCClient.on('data', function(data) {
 	tcpDataBuffer += data
 	try {
 		var response = JSON.parse(tcpDataBuffer)
+		tcpDataBuffer = '' // This is executed only if the message is reconstructed, so we can clean the buffer
 		if (response['method'] === undefined) { // This is a response to a previous command
 			logger(3, "Emitting response " + response['id'])
 			kodiEvent.emit(response['id'], response)
@@ -78,7 +79,7 @@ var onlyFiles = everything.filter( function (element) {
 	return !element.startsWith('.') & fs.statSync(localFolderBase + element).isFile()
 })
 
-logger(1, '--== File(s) not in a folde ==--')
+logger(1, '--== File(s) not in a folder ==--')
 logger(1,onlyFiles)
 
 var promiseMoviesList = new Promise (function (resolve, reject) {
@@ -97,17 +98,22 @@ promiseMoviesList.then(
 			//fs.renameSync(movie['file'], localFolderBase +  movie['label'] + ' (' + movie['year'] + ')/' + movie['file'].replace(kodiFolderBase,''))
 			//Clean & rebuild library
 			logger(1, localFolderBase +  movie['label'] + ' (' + movie['year'] + ')/' + movie['file'].replace(kodiFolderBase,''))
-
-			/*kodiEvent.on('VideoLibrary.OnCleanFinished', function(response) {
-				kodiRPCClient.write(stringJsonScanLibrary)
-				kodiEvent.removeListener('VideoLibrary.GetMovies')
-			})
-
-			kodiEvent.on('VideoLibrary.OnScanFinished', function(response) {
-			})
-
-			kodiRPCClient.write(stringJsonCleanLibrary)*/
 		})
+
+		kodiEvent.on('VideoLibrary.OnCleanFinished', function(response) {
+			logger(3, 'Library cleaned. Rescanning....')
+			kodiRPCClient.write(stringJsonScanLibrary)
+			kodiEvent.removeListener('VideoLibrary.OnCleanFinished')
+		})
+
+		kodiEvent.on('VideoLibrary.OnScanFinished', function(response) {
+			logger(1, 'Library cleaned and scanned!')
+			kodiRPCClient.destroy()
+
+		})
+		logger(3, 'Cleaning library ...')
+		kodiRPCClient.write(stringJsonCleanLibrary)
+
   })
   .catch(
     function(reason) {
