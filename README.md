@@ -4,6 +4,7 @@ Utility to tidy up kodi video library storage folder:
 * Find movies on the root folder and copy them in a subfolder for each movie (implementing ...)
 * Find movie that have not been indexed in Kodi (e.g. not added to kodi movie library) (not implemented yet)
 * Make all folder with the same naming convention (i.e. "< movie title > (< year >)") (not implemented yet) 
+* List files for movies / tvshows already seen 
 
 
 At the end of the above operations, the library is cleaned and re-scanned (implmenting) 
