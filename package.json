@@ -4,6 +4,9 @@
   "description": "Tidy up my Kodi library folder",
   "main": "tidyUpMyMoviesFolder.js",
   "dependencies": {
+    "cheerio": "^1.0.0-rc.2",
+    "moviedb": "^0.2.10",
+    "node-fetch": "^2.1.2",
     "request": "^2.74.0"
   },
   "devDependencies": {},
